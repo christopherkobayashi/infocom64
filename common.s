@@ -368,7 +368,9 @@ L3      sta     $0340,x
 L4      clc
         jsr     REU_DETECT
         bcs     L5
-        jsr     GEORAM_DETECT
+#ifdef GEORAM
+        jsr     GEORAM_DETECT	; this is broken on the Ultimate64
+#endif
 L5	jsr	UIEC_IDENTIFY
 	bcc	L6
 	lda	REU_PRESENT

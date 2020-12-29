@@ -12,15 +12,16 @@ GEOBUF_BANK =		$DFFF	; each bank is 16k, *not* 64k!
 				;  512k = $00-$1f
 				; 1024k = $00-$3f
 				; 2048k = $00-$7f 
-GEORAM_SIZE
-	.byte 0
-
-GEORAM_TEMP
-	.byte 0
 
 REU_BITS
 	.byte 7
 REU_BANKS
+	.byte 0
+
+GEORAM_SIZE
+	.byte 0
+
+GEORAM_TEMP
 	.byte 0
 
 GEORAM_DETECT
@@ -34,6 +35,7 @@ GEORAM_DETECT
 ;	inx
 ;	bne 	L0
 ;	txa
+	lda     #$bb
 L1	sta	GEOBUF_RAM,x	; write 256 bytes to GeoRAM
 	lda	GEOBUF_RAM,x	; read,
 	cmp	GEOBUF_RAM,x	; and compare ...

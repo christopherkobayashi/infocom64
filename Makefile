@@ -1,7 +1,7 @@
 # $Id$
 
 XA =		xa
-XAFLAGS =	-M -O PETSCII
+XAFLAGS =	-M -O PETSCII # -DGEORAM
 DATE =		$(shell date '+%Y/%m/%d')
 INC_STUFF =	common.s ramexp.s sd2iec.s
 
