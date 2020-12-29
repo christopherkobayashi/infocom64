@@ -80,7 +80,7 @@ L0	jsr     REU_SETUP_BANK          ; Fill top banks with $BB
 
 L1	sty	REU_BANKS
 	cpy	#00
-	beq	L1
+	beq	L2
 	lda	REU_PRESENT
         ora     #$01
 	sta	REU_PRESENT
@@ -152,6 +152,11 @@ REU_CHECK_BANK:
 .(
 	sty	Z_TEMP1
         lda     #$00
+	tax
+L1	sta	SECTOR_BUFFER,x
+	inx
+	bne	L1
+
         sta     REU_RBASE+1
         sta     REU_RBASE
         sta     REU_INT
