@@ -985,7 +985,7 @@ Z_RET_POPPED
         jmp     L15B4
 
 VERSION_TEXT:
-	.aasc   "C64 Version 8L (CUR_DATE-01)", $0d
+	.aasc   "C64 Version 8L (", CUR_DATE, "-01)", $0d
 	.aasc   "uIEC fixes by Chris Kobayashi", $0d
 	.aasc   "For Saya, Ao, Karie, and the KobaCats", $0d
 	.aasc   $0d

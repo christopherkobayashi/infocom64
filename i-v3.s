@@ -3613,7 +3613,7 @@ PUNCTUATION
 	.asc	"!?,.", $0d, " "
 
 VERSION_TEXT
-	.aasc	"C64 Version I (CUR_DATE-01)", $0d
+	.aasc	"C64 Version I (", CUR_DATE, "-01)", $0d
 	.aasc	"uIEC/EasyFlash code by Chris Kobayashi", $0d
 	.aasc	"For Saya, Ao, Karie, and the KobaCats", $0d
 	.aasc	$0d
