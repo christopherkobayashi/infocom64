@@ -109,19 +109,20 @@ STARTUP
         ldx     #$0B
         clc
         jsr     PLOT
-        ldx     #<STORY_LOADING_TEXT
+
+        lda     REU_PRESENT
+	and	#%00001111	; we have to have at least a uIEC ...
+	bne	L0a
+	lda	#$89
+	jmp	$FCE2		; this should be FATAL_ERROR
+
+L0a     ldx     #<STORY_LOADING_TEXT
         lda     #>STORY_LOADING_TEXT
         ldy     #$19
 ;        ldx     #<PATIENT
 ;        lda     #>PATIENT
 ;        ldy     #$28
         jsr     PRINT_MESSAGE
-
-        lda     REU_PRESENT
-	and	#%00001111	; we have to have at least a uIEC ...
-	bne	L1
-	lda	#$89
-	jmp	FATAL_ERROR
 
 L1	lda     #$00
         ldx     #$03
@@ -2631,6 +2632,7 @@ L1	jsr     NUMBER_TO_DIGIT
         dey
         bpl     L1
         jsr     CLRCHN
+	clc
         jsr     Z_NEW_LINE
         ldx     #<INT_ERROR_TEXT
         lda     #>INT_ERROR_TEXT
