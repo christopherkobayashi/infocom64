@@ -69,7 +69,7 @@ GEO_TXT .asc "k GeoRAM",0
 
 REU_DETECT:	; 2c75
 .(
-	ldy	#$01			; start with bank 1 -- good on 1700
+	ldy	#$00			; start with bank 0
 L0	jsr     REU_SETUP_BANK          ; Fill top banks with $BB
 	sty	REU_TEMP
 	ldy	#$00			; badness detection
