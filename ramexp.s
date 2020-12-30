@@ -13,9 +13,9 @@ GEOBUF_BANK =		$DFFF	; each bank is 16k, *not* 64k!
 				; 1024k = $00-$3f
 				; 2048k = $00-$7f 
 
-REU_BITS
-	.byte 7
 REU_BANKS
+	.byte 0
+REU_TEMP
 	.byte 0
 
 GEORAM_SIZE
@@ -55,33 +55,36 @@ L2	rts
 
 DET_TXT	.asc "Found ",0
 EASYFLASH_TXT .asc "EasyFlash", 0
-REUk_TXT .asc "k CBM REU",0
+REUk_TXT .asc " bank CBM REU",0
 GEO_TXT .asc "k GeoRAM",0
-C128_TXT	.asc " 128", 0
-		.asc " 256", 0
-		.asc " 512", 0
-		.asc "1024", 0
-		.asc "2048", 0
-		.asc "4096", 0
-		.asc "8192", 0
-		.asc "16384", 0
-		.byte 0
+;C128_TXT	.asc " 128", 0
+;		.asc " 256", 0
+;		.asc " 512", 0
+;		.asc "1024", 0
+;		.asc "2048", 0
+;		.asc "4096", 0
+;		.asc "8192", 0
+;		.asc "16384", 0
+;		.byte 0
 
 REU_DETECT:	; 2c75
 .(
-	ldy	#$ff
+	ldy	#$01			; start with bank 1 -- good on 1700
 L0	jsr     REU_SETUP_BANK          ; Fill top banks with $BB
+	sty	REU_TEMP
+	ldy	#$00			; badness detection
+	jsr	REU_SETUP_BANK
+	ldy	REU_TEMP
 	jsr	REU_CHECK_BANK
 	bcc	L1
-	dec	REU_BITS
-	clc
-	tya
-	lsr
-	tay
+	iny
 	bne 	L0
 
-L1	sty	REU_BANKS
-	cpy	#00
+	ldy	#$ff			; if we fallthrough here, it's 16384k
+L1	tya
+	clc
+	sta	REU_BANKS
+	cmp	#00
 	beq	L2
 	lda	REU_PRESENT
         ora     #$01
@@ -93,18 +96,26 @@ L1a	lda	DET_TXT,y
 	iny
 	bne 	L1a
 
-L1a1	ldy	REU_BITS
-	lda	#0
-L1a1a	clc
-	adc	#5
-	dey
-	bne	L1a1a
-	tay
-L1b	lda	C128_TXT,y
-	beq	L1b0
+L1a1	lda	REU_BANKS
+	; from http://forum.6502.org/viewtopic.php?f=2&t=3164 -- byte to ascii
+	sed        ;2  @2
+	tax        ;2  @4
+	and #$0F   ;2  @6
+	cmp #9+1   ;2  @8
+	adc #$30   ;2  @10
+	tay        ;2  @12
+	txa        ;2  @14
+	lsr        ;2  @16
+	lsr        ;2  @18
+	lsr        ;2  @20
+	lsr        ;2  @22
+	cmp #9+1   ;2  @24
+	adc #$30   ;2  @26
+	cld        ;2  @28
+	jsr 	CHROUT
+	tya
 	jsr	CHROUT
-	iny
-	bne	L1b
+
 L1b0	ldy	#0
 L1b1	lda	REUk_TXT,y
 	beq	L1b1a
@@ -125,8 +136,8 @@ REU_SETUP_BANK:	; 2c59
 .(
         sty     Z_TEMP1			; bank number we're probing
 					; see if we already probed this bank
-L1      ldx     #$00
-	lda	#$bb
+L1      ldx     #0
+	tya
 L2      sta     SECTOR_BUFFER,x
         inx
         bne     L2
@@ -153,12 +164,13 @@ L2      sta     SECTOR_BUFFER,x
 REU_CHECK_BANK:
 .(
 	sty	Z_TEMP1
-        lda     #$00
+	lda     #$bb
 	tax
 L1	sta	SECTOR_BUFFER,x
 	inx
 	bne	L1
 
+	lda	#0
         sta     REU_RBASE+1
         sta     REU_RBASE
         sta     REU_INT
@@ -176,8 +188,8 @@ L1	sta	SECTOR_BUFFER,x
         sta     REU_COMMAND
 
 	lda	SECTOR_BUFFER
-	cmp	#$bb
-	beq	L2
+	cmp	Z_TEMP1
+	bne	L2
 	sec
 	rts
 L2	clc
