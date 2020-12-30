@@ -15,8 +15,6 @@ GEOBUF_BANK =		$DFFF	; each bank is 16k, *not* 64k!
 
 REU_BANKS
 	.byte 0
-REU_TEMP
-	.byte 0
 
 GEORAM_SIZE
 	.byte 0
@@ -71,10 +69,12 @@ REU_DETECT:	; 2c75
 .(
 	ldy	#$00			; start with bank 0
 L0	jsr     REU_SETUP_BANK          ; Fill top banks with $BB
-	sty	REU_TEMP
+	tya
+	pha
 	ldy	#$00			; badness detection
 	jsr	REU_SETUP_BANK
-	ldy	REU_TEMP
+	pla
+	tay
 	jsr	REU_CHECK_BANK
 	bcc	L1
 	iny
@@ -164,8 +164,9 @@ L2      sta     SECTOR_BUFFER,x
 REU_CHECK_BANK:
 .(
 	sty	Z_TEMP1
-	lda     #$bb
-	tax
+	tya
+	eor	#$ff
+	ldx	#0
 L1	sta	SECTOR_BUFFER,x
 	inx
 	bne	L1
